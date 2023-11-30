@@ -3,4 +3,6 @@ import { entry } from './constants';
 
 const m = require(entry);
 
-export default m.default;
+const { verifyConditions, prepare } = m;
+
+export { verifyConditions, prepare };

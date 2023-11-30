@@ -1,4 +1,6 @@
 {
     "dir": "tmp/package-tests",
+    "copy": [[ "tests/bundles", "tests/bundles" ]],
+    "supportedNodeVersion": ">=12 <=20",
     "copyDefaultFiles": true
 }

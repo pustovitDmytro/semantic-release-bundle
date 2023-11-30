@@ -1,5 +1,21 @@
 import path from 'path';
+import { assert } from 'chai';
 import { entry } from './constants';
+
+export async function checkError(promise, type, message) {
+    try {
+        await promise;
+        assert.fail();
+    } catch (error) {
+        if (error.name === 'AssertionError') throw error;
+        assert.equal(error.name, type, error.toString());
+        assert.equal(
+            error.message.replace(/\s+/g, ''),
+            message.replace(/\s+/g, ''),
+            error.toString()
+        );
+    }
+}
 
 export function load(relPath, clearCache) {
     const absPath = path.resolve(entry, relPath);
@@ -15,4 +31,14 @@ export function load(relPath, clearCache) {
 
 export function resolve(relPath) {
     return require.resolve(path.join(entry, relPath));
+}
+
+export class MockLogger {
+    constructor() {
+        this.messages = [];
+    }
+
+    log(message) {
+        this.messages.push({ level: 'info', message });
+    }
 }

@@ -1,8 +1,13 @@
 import { assert } from 'chai';
-import entry from '../entry';
+import { verifyConditions, prepare } from '../entry';
+import '../Test';
 
 suite('Configurations');
 
-test('Default configuration', function () {
-    assert.exists(entry);
+test('verifyConditions', function () {
+    assert.isFunction(verifyConditions);
+});
+
+test('prepare', function () {
+    assert.isFunction(prepare);
 });

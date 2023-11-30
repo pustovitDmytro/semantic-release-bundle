@@ -1,0 +1,1 @@
+import{m as t,v as a,_ as o}from"./q-9157976a.js";const i=t(a(()=>o(()=>import("./q-a5b34c92.js"),["build/q-a5b34c92.js","build/q-9157976a.js","build/q-e3bd038d.js"]),"s_ViycXRQlp0Q")),s={title:"About Tastoria",meta:[{name:"about",content:"About page"}]};export{i as default,s as head};

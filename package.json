@@ -1,8 +1,17 @@
 {
-  "name": "npm-boilerplate",
+  "name": "semantic-release-bundle",
   "version": "0.0.1",
-  "description": "boilerplate for creating npm packages",
+  "description": "A package designed to replace package versions in JavaScript bundles",
   "main": "./lib",
+  "keywords": [
+    "semantic-release",
+    "qwik",
+    "bundle",
+    "version",
+    "package.json",
+    "publish",
+    "q-manifest.json"
+  ],
   "scripts": {
     "prepare": "babel src --out-dir ./lib --copy-files && husky install",
     "coveralls": "cat ./reports/coverage/lcov.info | coveralls",
@@ -20,17 +29,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pustovitDmytro/npm-boilerplate.git"
+    "url": "https://github.com/pustovitDmytro/semantic-release-bundle.git"
   },
   "author": "Dmytro Pustovit",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pustovitDmytro/npm-boilerplate/issues"
+    "url": "https://github.com/pustovitDmytro/semantic-release-bundle/issues"
   },
   "engines": {
     "node": ">=10"
   },
-  "homepage": "https://github.com/pustovitDmytro/npm-boilerplate#readme",
+  "homepage": "https://github.com/pustovitDmytro/semantic-release-bundle#readme",
   "devDependencies": {
     "@babel/cli": "^7.19.3",
     "@babel/core": "^7.20.5",
@@ -48,11 +57,10 @@
     "@semantic-release/git": "^10.0.1",
     "babel-plugin-module-resolver": "^4.1.0",
     "chai": "^4.3.7",
-    "chance": "^1.1.9",
     "conventional-changelog-eslint": "^3.0.9",
     "coveralls": "^3.1.1",
     "danger": "^11.2.0",
-    "eslint": "^8.30.0",
+    "eslint": "^8.51.0",
     "eslint-config-incredible": "^2.4.2",
     "eslint-plugin-censor": "^1.5.2",
     "eslint-plugin-import": "^2.26.0",
@@ -65,7 +73,7 @@
     "eslint-plugin-scanjs-rules": "^0.2.1",
     "eslint-plugin-security": "^1.5.0",
     "eslint-plugin-sonarjs": "^0.17.0",
-    "eslint-plugin-unicorn": "45.0.2",
+    "eslint-plugin-unicorn": "49.0.0",
     "fs-extra": "^11.1.0",
     "husky": "^8.0.2",
     "jscpd": "^3.5.3",
@@ -77,5 +85,10 @@
     "semantic-release": "^19.0.5",
     "semantic-release-telegram": "^1.6.0",
     "uuid": "^9.0.0"
+  },
+  "dependencies": {
+    "cottus": "1.11.0",
+    "fs-extra": "10.0.0",
+    "myrmidon": "1.7.2"
   }
 }
