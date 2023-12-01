@@ -1,6 +1,6 @@
 {
   "name": "semantic-release-bundle",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A package designed to replace package versions in JavaScript bundles",
   "main": "./lib",
   "keywords": [

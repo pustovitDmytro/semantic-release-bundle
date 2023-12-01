@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/pustovitDmytro/semantic-release-bundle/compare/v1.0.0...v1.0.1) (2023-12-01)
+
+
+### Fix
+
+* identation for modified package.json ([65695de](https://github.com/pustovitDmytro/semantic-release-bundle/commit/65695de7ecfbc2cb2ede58b9f4b101088f26957a))
+
 # 1.0.0 (2023-11-30)
 
 
