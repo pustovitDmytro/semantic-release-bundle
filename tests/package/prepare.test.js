@@ -59,7 +59,7 @@ test('Positive: update package.json', async function () {
     assert.notExists(logger.messages.find(m => m.message.includes(bundlename)));
 
     assert.deepOwnInclude(
-        await fs.readJSON(path.join(path.resolve(packageBundle), 'package.json')),
+        await fs.readJSON(path.resolve(packageBundle, 'package.json')),
         { version: '1.3.0' }
     );
 });

@@ -11,7 +11,7 @@ export default async function prepare(pluginConfig, { logger, nextRelease } = {}
         const packageContent = await fs.readJSON(this.verified.packageJSONPath);
 
         packageContent.version = next;
-        await fs.writeJSON(this.verified.packageJSONPath, packageContent);
+        await fs.writeJSON(this.verified.packageJSONPath, packageContent, { spaces: 2 });
         logger.log(`package.json version updated to ${next}`);
     }
 
