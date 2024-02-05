@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/pustovitDmytro/semantic-release-bundle/compare/v1.0.1...v1.1.0) (2024-02-05)
+
+
+### New
+
+* adds vite-define ([7707146](https://github.com/pustovitDmytro/semantic-release-bundle/commit/77071462f3814bbde679d0ce266fb2e5db6c3a85))
+
 ## [1.0.1](https://github.com/pustovitDmytro/semantic-release-bundle/compare/v1.0.0...v1.0.1) (2023-12-01)
 
 
