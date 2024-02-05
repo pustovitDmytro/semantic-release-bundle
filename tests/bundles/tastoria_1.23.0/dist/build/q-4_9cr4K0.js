@@ -1,0 +1,1 @@
+import{P as e}from"./q-BTttGwnV.js";import{c as t,j as a,K as o}from"./q-grzRItSl.js";import{r as m}from"./q-mmDR2EFA.js";import{useCreate as s}from"./q-8bYDCxRE.js";import"./q-yQnnJER4.js";import"./q-5LSN8IXO.js";const v=()=>{t(m);const r=s();return a(e,{onSave:r,[o]:{onSave:o}},3,"6W_0")};export{v as s_q0qZrjjkaxw};

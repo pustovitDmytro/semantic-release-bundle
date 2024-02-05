@@ -1,16 +1,20 @@
 import path from 'path';
 import fs from 'fs-extra';
+import { last } from 'myrmidon';
 import { validate } from './utils';
 import { NO_FILE } from './Error';
 
 const basicRules = {
-    type            : [ 'required',  { 'enum': [ 'q-manifest' ] } ],
+    type            : [ 'required',  { 'enum': [ 'q-manifest', 'vite-define' ] } ],
     packageJSONPath : [ 'string', { default: 'package.json' } ]
 };
 
 const typeRules = {
     'q-manifest' : {
         buildDirectory : [ 'string', { default: 'build' } ]
+    },
+    'vite-define' : {
+        versionKey : [ 'string', { default: 'VERSION' } ]
     }
 };
 
@@ -32,6 +36,81 @@ async function checkFile(filePath) {
     const isExists = await fs.exists(filePath);
 
     if (!isExists) throw new NO_FILE(filePath);
+}
+
+export async function getFiles(dir) {
+    const subdirs = await fs.readdir(dir);
+    const files = await Promise.all(subdirs.map(async (subdir) => {
+        const res = path.resolve(dir, subdir);
+        const stat = await fs.stat(res);
+
+        return stat.isDirectory() ? getFiles(res) : res;
+    }));
+
+    // eslint-disable-next-line unicorn/prefer-spread, unicorn/no-array-reduce
+    return files.reduce((a, f) => a.concat(f), []);
+}
+
+async function handleQMainfest(validated, typeValid, { packageJSONPath }, { logger }) {
+    const valid  = {
+        qManifestPath : path.resolve(validated.distPath, 'q-manifest.json')
+    };
+
+    await checkFile(valid.qManifestPath);
+
+    const qManifest = await fs.readJSON(valid.qManifestPath);
+    const bundleNames = await getBundleNames(qManifest, path.basename(packageJSONPath));
+
+    // eslint-disable-next-line require-atomic-updates, no-param-reassign
+    valid.bundles = await Promise.all(bundleNames.map(async name => {
+        const bundlePath = path.resolve(validated.distPath, typeValid.buildDirectory, name);
+
+        await checkFile(bundlePath);
+
+        return bundlePath;
+    }));
+
+    if (bundleNames.length > 0) {
+        logger.log(`Replace version in: ${bundleNames.join(', ')}`);
+    } else {
+        logger.warn(`No suitable bundles found in ${valid.qManifestPath}`);
+    }
+
+    return valid;
+}
+
+
+async function handleViteDefine(validated, typeValid, { prevVersion }, { logger }) {
+    const valid = {};
+    const versionKeys = typeValid.versionKey.split('.');
+    const versionKey = last(versionKeys);
+
+    const distFiles = await getFiles(validated.distPath);
+    const jsFiles = distFiles.filter(f => path.extname(f) === '.js');
+    const bundles = [];
+    // eslint-disable-next-line security/detect-non-literal-regexp
+    const regexp = new RegExp(`${versionKey}[:=]['"]${prevVersion}['"]`, 'g');
+
+    for (const fileName of jsFiles) {
+        const buffer = await fs.readFile(fileName);
+        const content = buffer.toString();
+
+        if (regexp.test(content)) {
+            bundles.push(fileName);
+        }
+    }
+
+    if (bundles.length > 0) {
+        const bundleNames = bundles.map(b => path.relative(validated.distPath, b));
+
+        logger.log(`Replace version in: ${bundleNames.join(', ')}`);
+    } else {
+        logger.warn(`No suitable bundles found in ${valid.qManifestPath}`);
+    }
+
+    valid.bundles = bundles;
+
+    return valid;
 }
 
 export default async function verifyConditions(pluginConfig, { logger, cwd }) {
@@ -57,27 +136,14 @@ export default async function verifyConditions(pluginConfig, { logger, cwd }) {
         distPath : path.resolve(cwd, data.directory)
     };
 
+    let handleValid = {};
+
     if (basicValid.type === 'q-manifest') {
-        valid.qManifestPath = path.resolve(valid.distPath, 'q-manifest.json');
-        await checkFile(valid.qManifestPath);
+        handleValid = await handleQMainfest(valid, typeValid, { packageJSONPath }, { logger });
+    }
 
-        const qManifest = await fs.readJSON(valid.qManifestPath);
-        const bundleNames = await getBundleNames(qManifest, path.basename(packageJSONPath));
-
-        // eslint-disable-next-line require-atomic-updates
-        valid.bundles = await Promise.all(bundleNames.map(async name => {
-            const bundlePath = path.resolve(valid.distPath, typeValid.buildDirectory, name);
-
-            await checkFile(bundlePath);
-
-            return bundlePath;
-        }));
-
-        if (bundleNames.length > 0) {
-            logger.log(`Replace version in: ${bundleNames.join(',')}`);
-        } else {
-            logger.warn(`No suitable bundles found in ${valid.qManifestPath}`);
-        }
+    if (basicValid.type === 'vite-define') {
+        handleValid = await handleViteDefine(valid, typeValid, { prevVersion: data.previousVersion }, { logger });
     }
 
 
@@ -85,7 +151,8 @@ export default async function verifyConditions(pluginConfig, { logger, cwd }) {
         ...basicValid,
         ...data,
         ...typeValid,
-        ...valid
+        ...valid,
+        ...handleValid
     };
 
     return data;

@@ -13,9 +13,10 @@ const t = new Test();
 
 const testBundles = path.resolve('tests/bundles');
 
-const [ distBundle, packageBundle ] = [
+const [ distBundle, packageBundle, viteDefineBundle ] = [
     path.join(tmpFolder, 'tastoria_dist'),
-    path.join(tmpFolder, 'tastoria_pkg')
+    path.join(tmpFolder, 'tastoria_pkg'),
+    path.join(tmpFolder, 'viteDefine_tastoria')
 ];
 
 const bundlename = 'q-e3bd038d.js';
@@ -24,6 +25,7 @@ before(async function () {
     await t.setTmpFolder();
     await fs.copy(path.resolve(testBundles, 'tastoria_1.2.1'), distBundle);
     await fs.copy(path.resolve(testBundles, 'tastoria_1.2.1'), packageBundle);
+    await fs.copy(path.resolve(testBundles, 'tastoria_1.23.0'), viteDefineBundle);
 });
 
 test('Negative: run prepare without verify', async function () {
@@ -64,7 +66,7 @@ test('Positive: update package.json', async function () {
     );
 });
 
-test('Positive: update bundles', async function () {
+test('Positive: update bundles by q-manifest', async function () {
     const logger = new MockLogger();
 
     await prepare.call(
@@ -72,6 +74,7 @@ test('Positive: update bundles', async function () {
             type              : 'q-manifest',
             previousVersion   : '1.2.1',
             updatePackageJSON : false,
+            distPath          : path.join(distBundle, 'dist'),
             bundles           : [
                 path.join(distBundle, `dist/build/${bundlename}`)
             ]
@@ -85,7 +88,7 @@ test('Positive: update bundles', async function () {
 
     assert.deepEqual(logger.messages[0], {
         level   : 'info',
-        message : `${bundlename} version updated to 1.2.8`
+        message : `build/${bundlename} version updated to 1.2.8`
     });
 
     assert.notExists(logger.messages.find(m => m.message.includes('package.json')));
@@ -95,6 +98,46 @@ test('Positive: update bundles', async function () {
     assert.include(buff.toString(), '"1.2.8"');
 });
 
+test('Positive: update bundles by vite define', async function () {
+    const logger = new MockLogger();
+    const version = '1.23.0';
+    const basePath = viteDefineBundle;
+    const bundles = [
+        'service-worker.js',
+        'build/q-BTttGwnV.js'
+    ];
+
+    await prepare.call(
+        { verified : {
+            type              : 'vite-define',
+            previousVersion   : version,
+            updatePackageJSON : false,
+            versionKey        : 'VERSION',
+            distPath          : path.join(basePath, 'dist'),
+            bundles           : bundles.map(b => path.join(basePath, 'dist', b))
+        } },
+        null,
+        {
+            logger,
+            nextRelease : { version: '1.23.1' }
+        }
+    );
+
+
+    assert.notExists(logger.messages.find(m => m.message.includes('package.json')));
+
+    for (const bundleName of bundles) {
+        assert.exists(
+            logger.messages.find(m => m.level === 'info' && m.message.includes(bundleName)),
+            bundleName
+        );
+        const buff = await fs.readFile(path.join(basePath, 'dist', bundleName));
+
+        assert.notInclude(buff.toString(), version, bundleName);
+        assert.include(buff.toString(), '"1.23.1"', bundleName);
+        assert.include(buff.toString(), ',VERSION:"1.23.1"}', bundleName);
+    }
+});
 
 after(async function () {
     await t.cleanTmpFolder();

@@ -1,0 +1,1 @@
+const o='"../../variables.css"',t="#00b27c",e="#1a602e",_="_page_18q4h_4",r="_uploader_18q4h_13",n="_infoPage_18q4h_19",p="_exportBox_18q4h_27",s="_exportText_18q4h_36",c="_exportButton_18q4h_40",a="_icon_18q4h_49",x={colors:o,primary_1:t,primary_2:e,page:_,uploader:r,infoPage:n,exportBox:p,exportText:s,exportButton:c,icon:a};export{x as s};

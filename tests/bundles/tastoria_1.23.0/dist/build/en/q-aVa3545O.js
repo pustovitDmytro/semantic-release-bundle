@@ -1,0 +1,1 @@
+const o="_page_1mw4f_1",e="_image_1mw4f_10",_="_paper_1mw4f_18",n="_content_1mw4f_32",f="_infoBox_1mw4f_38",t="_infoName_1mw4f_45",a="_infoValue_1mw4f_49",m="_header_1mw4f_53",s="_footer_1mw4f_58",c={page:o,image:e,paper:_,content:n,infoBox:f,infoName:t,infoValue:a,header:m,footer:s};export{c as s};

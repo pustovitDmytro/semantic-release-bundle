@@ -1,0 +1,1 @@
+import{C as n,b as e}from"./q-grzRItSl.js";import{s}from"./q-aVa3545O.js";const t=l=>n("div",null,{class:s.infoBox},[n("span",null,{class:s.infoName},e(a=>a.name,[l]),3,null),l.value&&n("span",null,{class:s.infoValue},e(a=>a.value,[l]),3,"OE_0")],1,l.label+l.name);export{t as s_Nsh9S0Su4Jw};

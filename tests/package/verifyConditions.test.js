@@ -58,6 +58,35 @@ test('Positive: valid q-manifest configuration', async function () {
     });
 });
 
+test('Positive: valid vite-define configuration', async function () {
+    const version = '1.23.0';
+    const viteDefineConfig = {
+        type            : 'vite-define',
+        packageJSONPath : path.resolve(testBundles, `tastoria_${version}/package.json`),
+        directory       : path.resolve(testBundles, `tastoria_${version}/dist`)
+    };
+    const context = {};
+
+    await verifyConditions.call(
+        context,
+        { ...viteDefineConfig },
+        defaultOptions
+    );
+
+    assert.deepOwnInclude(context.verified, {
+        type            : 'vite-define',
+        directory       : viteDefineConfig.directory,
+        previousVersion : version,
+        distPath        : viteDefineConfig.directory
+    });
+
+    assert.includeMembers(context.verified.bundles, [
+        path.join(viteDefineConfig.directory, 'service-worker.js'),
+        path.join(viteDefineConfig.directory, 'build/en/q-BTttGwnV.js')
+    ]);
+});
+
+
 test('Negative: invalid package.json path', async function () {
     const promise = verifyConditions.call(
         {},

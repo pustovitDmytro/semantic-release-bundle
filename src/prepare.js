@@ -18,9 +18,11 @@ export default async function prepare(pluginConfig, { logger, nextRelease } = {}
     const prev = this.verified.previousVersion;
 
     const promises = this.verified.bundles.map(async bundlePath => {
-        const bundleName = path.basename(bundlePath);
+        const bundleName = path.relative(this.verified.distPath, bundlePath);
+
         const buffer = await fs.readFile(bundlePath);
         const content = buffer.toString();
+
         /* eslint-disable security/detect-non-literal-regexp */
         const updated = content
             .replace(new RegExp(`'${prev}'`, 'g'), `'${next}'`)

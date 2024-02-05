@@ -1,0 +1,1 @@
+import{C as t}from"./q-grzRItSl.js";const e="/build/q-A-urYXXE.webp 200w, /build/q-PLKUaGRy.webp 256w",i=256,d=256,c={srcSet:e,width:i,height:d};function u(n,o,s,r){return t("img",{decoding:"async",loading:"lazy",...n},c,void 0,3,o)}export{u as G};
