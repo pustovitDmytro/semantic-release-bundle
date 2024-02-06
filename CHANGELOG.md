@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/pustovitDmytro/semantic-release-bundle/compare/v1.1.0...v1.2.0) (2024-02-06)
+
+
+### New
+
+* support for list of directories ([a888367](https://github.com/pustovitDmytro/semantic-release-bundle/commit/a88836796a3fccf28352ee08d473ca9a6f816730))
+
 # [1.1.0](https://github.com/pustovitDmytro/semantic-release-bundle/compare/v1.0.1...v1.1.0) (2024-02-05)
 
 
