@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs-extra';
-import { last } from 'myrmidon';
+import { last, flatten } from 'myrmidon';
 import { validate } from './utils';
 import { NO_FILE } from './Error';
 
@@ -19,7 +19,7 @@ const typeRules = {
 };
 
 const genericRules = {
-    directory         : [ 'string', { default: 'dist' } ],
+    directory         : [ { 'every': 'string' }, { default: [ 'dist' ] } ],
     previousVersion   : [ 'required', 'string' ],
     updatePackageJSON : [ 'boolean', { default: false } ]
 };
@@ -51,9 +51,9 @@ export async function getFiles(dir) {
     return files.reduce((a, f) => a.concat(f), []);
 }
 
-async function handleQMainfest(validated, typeValid, { packageJSONPath }, { logger }) {
+async function handleQMainfest(distPath, typeValid, { packageJSONPath }, { logger }) {
     const valid  = {
-        qManifestPath : path.resolve(validated.distPath, 'q-manifest.json')
+        qManifestPath : path.resolve(distPath, 'q-manifest.json')
     };
 
     await checkFile(valid.qManifestPath);
@@ -63,7 +63,7 @@ async function handleQMainfest(validated, typeValid, { packageJSONPath }, { logg
 
     // eslint-disable-next-line require-atomic-updates, no-param-reassign
     valid.bundles = await Promise.all(bundleNames.map(async name => {
-        const bundlePath = path.resolve(validated.distPath, typeValid.buildDirectory, name);
+        const bundlePath = path.resolve(distPath, typeValid.buildDirectory, name);
 
         await checkFile(bundlePath);
 
@@ -80,12 +80,15 @@ async function handleQMainfest(validated, typeValid, { packageJSONPath }, { logg
 }
 
 
-async function handleViteDefine(validated, typeValid, { prevVersion }, { logger }) {
+async function handleViteDefine(directories, typeValid, { prevVersion }, { logger }) {
     const valid = {};
     const versionKeys = typeValid.versionKey.split('.');
     const versionKey = last(versionKeys);
 
-    const distFiles = await getFiles(validated.distPath);
+    const distFiles = flatten(
+        await Promise.all(directories.map(d => getFiles(d)))
+    );
+
     const jsFiles = distFiles.filter(f => path.extname(f) === '.js');
     const bundles = [];
     // eslint-disable-next-line security/detect-non-literal-regexp
@@ -101,7 +104,7 @@ async function handleViteDefine(validated, typeValid, { prevVersion }, { logger 
     }
 
     if (bundles.length > 0) {
-        const bundleNames = bundles.map(b => path.relative(validated.distPath, b));
+        const bundleNames = bundles.map(b => path.basename(b));
 
         logger.log(`Replace version in: ${bundleNames.join(', ')}`);
     } else {
@@ -132,18 +135,16 @@ export default async function verifyConditions(pluginConfig, { logger, cwd }) {
 
     logger.log(`Detected: ${basicValid.type} configuration. previous version: ${data.previousVersion}`);
 
-    const valid = {
-        distPath : path.resolve(cwd, data.directory)
-    };
+    const directories = data.directory.map(d => path.resolve(cwd, d));
 
     let handleValid = {};
 
     if (basicValid.type === 'q-manifest') {
-        handleValid = await handleQMainfest(valid, typeValid, { packageJSONPath }, { logger });
+        handleValid = await handleQMainfest(directories[0], typeValid, { packageJSONPath }, { logger });
     }
 
     if (basicValid.type === 'vite-define') {
-        handleValid = await handleViteDefine(valid, typeValid, { prevVersion: data.previousVersion }, { logger });
+        handleValid = await handleViteDefine(directories, typeValid, { prevVersion: data.previousVersion }, { logger });
     }
 
 
@@ -151,7 +152,6 @@ export default async function verifyConditions(pluginConfig, { logger, cwd }) {
         ...basicValid,
         ...data,
         ...typeValid,
-        ...valid,
         ...handleValid
     };
 

@@ -1,0 +1,35 @@
+functionsDirectory = "/home/circleci/project/netlify/functions"
+functionsDirectoryOrigin = "ui"
+plugins = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "/home/circleci/project/dist"
+publishOrigin = "config"
+command = "npm run build"
+commandOrigin = "config"
+functions = "/home/circleci/project/netlify/functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[[headers]]
+for = "/build/*"
+
+[headers.values]
+Cache-Control = "public, max-age=31536000, s-maxage=31536000, immutable"

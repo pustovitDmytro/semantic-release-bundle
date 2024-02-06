@@ -23,7 +23,7 @@ const cwd = process.cwd();
 const tastoriaValidConfig = {
     type            : 'q-manifest',
     packageJSONPath : tastoriaPackage,
-    directory       : tastoriaDist
+    directory       : [ tastoriaDist ]
 };
 
 const defaultOptions = {
@@ -46,11 +46,10 @@ test('Positive: valid q-manifest configuration', async function () {
     assert.deepOwnInclude(context.verified, {
         type              : 'q-manifest',
         packageJSONPath   : tastoriaPackage,
-        directory         : tastoriaDist,
+        directory         : [ tastoriaDist ],
         previousVersion   : '1.2.1',
         updatePackageJSON : false,
         buildDirectory    : 'build',
-        distPath          : tastoriaDist,
         qManifestPath     : path.join(tastoriaDist, 'q-manifest.json'),
         bundles           : [
             path.join(tastoriaDist, 'build/q-e3bd038d.js')
@@ -63,7 +62,10 @@ test('Positive: valid vite-define configuration', async function () {
     const viteDefineConfig = {
         type            : 'vite-define',
         packageJSONPath : path.resolve(testBundles, `tastoria_${version}/package.json`),
-        directory       : path.resolve(testBundles, `tastoria_${version}/dist`)
+        directory       : [
+            path.resolve(testBundles, `tastoria_${version}/dist`),
+            path.resolve(testBundles, `tastoria_${version}/.netlify`)
+        ]
     };
     const context = {};
 
@@ -76,13 +78,13 @@ test('Positive: valid vite-define configuration', async function () {
     assert.deepOwnInclude(context.verified, {
         type            : 'vite-define',
         directory       : viteDefineConfig.directory,
-        previousVersion : version,
-        distPath        : viteDefineConfig.directory
+        previousVersion : version
     });
 
     assert.includeMembers(context.verified.bundles, [
-        path.join(viteDefineConfig.directory, 'service-worker.js'),
-        path.join(viteDefineConfig.directory, 'build/en/q-BTttGwnV.js')
+        path.join(viteDefineConfig.directory[0], 'service-worker.js'),
+        path.join(viteDefineConfig.directory[0], 'build/en/q-BTttGwnV.js'),
+        path.join(viteDefineConfig.directory[1], 'edge-functions/entry.netlify-edge/assets/@qwik-city-plan-fJjVhFmu.js')
     ]);
 });
 

@@ -74,7 +74,6 @@ test('Positive: update bundles by q-manifest', async function () {
             type              : 'q-manifest',
             previousVersion   : '1.2.1',
             updatePackageJSON : false,
-            distPath          : path.join(distBundle, 'dist'),
             bundles           : [
                 path.join(distBundle, `dist/build/${bundlename}`)
             ]
@@ -88,7 +87,7 @@ test('Positive: update bundles by q-manifest', async function () {
 
     assert.deepEqual(logger.messages[0], {
         level   : 'info',
-        message : `build/${bundlename} version updated to 1.2.8`
+        message : `${bundlename} version updated to 1.2.8`
     });
 
     assert.notExists(logger.messages.find(m => m.message.includes('package.json')));
@@ -113,7 +112,6 @@ test('Positive: update bundles by vite define', async function () {
             previousVersion   : version,
             updatePackageJSON : false,
             versionKey        : 'VERSION',
-            distPath          : path.join(basePath, 'dist'),
             bundles           : bundles.map(b => path.join(basePath, 'dist', b))
         } },
         null,
@@ -128,7 +126,7 @@ test('Positive: update bundles by vite define', async function () {
 
     for (const bundleName of bundles) {
         assert.exists(
-            logger.messages.find(m => m.level === 'info' && m.message.includes(bundleName)),
+            logger.messages.find(m => m.level === 'info' && m.message.includes(path.basename(bundleName))),
             bundleName
         );
         const buff = await fs.readFile(path.join(basePath, 'dist', bundleName));

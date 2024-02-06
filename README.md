@@ -79,7 +79,7 @@ Configure the plugin in the semantic-release [configuration file][sr-config]:
 Customizable options include:
   * `type`: required, Strategy to use, 'q-manifest' or 'vite-define'
   * `packageJSONPath`: Specify the path to the package.json file (default is 'package.json')
-  * `directory`: Bundle directory (default is 'dist')
+  * `directory`: list of bundle directories (default is ['dist'])
   * `updatePackageJSON`: Update version in package.json file
 
 Strategy-related options:
